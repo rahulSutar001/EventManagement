@@ -12,6 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardVolunteerRouteImport } from './routes/dashboard.volunteer'
+import { Route as DashboardSponsorRouteImport } from './routes/dashboard.sponsor'
+import { Route as DashboardParticipantRouteImport } from './routes/dashboard.participant'
+import { Route as DashboardOrganizerRouteImport } from './routes/dashboard.organizer'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -28,35 +32,93 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardVolunteerRoute = DashboardVolunteerRouteImport.update({
+  id: '/dashboard/volunteer',
+  path: '/dashboard/volunteer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardSponsorRoute = DashboardSponsorRouteImport.update({
+  id: '/dashboard/sponsor',
+  path: '/dashboard/sponsor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardParticipantRoute = DashboardParticipantRouteImport.update({
+  id: '/dashboard/participant',
+  path: '/dashboard/participant',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardOrganizerRoute = DashboardOrganizerRouteImport.update({
+  id: '/dashboard/organizer',
+  path: '/dashboard/organizer',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/dashboard/organizer': typeof DashboardOrganizerRoute
+  '/dashboard/participant': typeof DashboardParticipantRoute
+  '/dashboard/sponsor': typeof DashboardSponsorRoute
+  '/dashboard/volunteer': typeof DashboardVolunteerRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/dashboard/organizer': typeof DashboardOrganizerRoute
+  '/dashboard/participant': typeof DashboardParticipantRoute
+  '/dashboard/sponsor': typeof DashboardSponsorRoute
+  '/dashboard/volunteer': typeof DashboardVolunteerRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/dashboard/organizer': typeof DashboardOrganizerRoute
+  '/dashboard/participant': typeof DashboardParticipantRoute
+  '/dashboard/sponsor': typeof DashboardSponsorRoute
+  '/dashboard/volunteer': typeof DashboardVolunteerRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/signup'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/signup'
+    | '/dashboard/organizer'
+    | '/dashboard/participant'
+    | '/dashboard/sponsor'
+    | '/dashboard/volunteer'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/signup'
-  id: '__root__' | '/' | '/login' | '/signup'
+  to:
+    | '/'
+    | '/login'
+    | '/signup'
+    | '/dashboard/organizer'
+    | '/dashboard/participant'
+    | '/dashboard/sponsor'
+    | '/dashboard/volunteer'
+  id:
+    | '__root__'
+    | '/'
+    | '/login'
+    | '/signup'
+    | '/dashboard/organizer'
+    | '/dashboard/participant'
+    | '/dashboard/sponsor'
+    | '/dashboard/volunteer'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
   SignupRoute: typeof SignupRoute
+  DashboardOrganizerRoute: typeof DashboardOrganizerRoute
+  DashboardParticipantRoute: typeof DashboardParticipantRoute
+  DashboardSponsorRoute: typeof DashboardSponsorRoute
+  DashboardVolunteerRoute: typeof DashboardVolunteerRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -82,6 +144,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/volunteer': {
+      id: '/dashboard/volunteer'
+      path: '/dashboard/volunteer'
+      fullPath: '/dashboard/volunteer'
+      preLoaderRoute: typeof DashboardVolunteerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/sponsor': {
+      id: '/dashboard/sponsor'
+      path: '/dashboard/sponsor'
+      fullPath: '/dashboard/sponsor'
+      preLoaderRoute: typeof DashboardSponsorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/participant': {
+      id: '/dashboard/participant'
+      path: '/dashboard/participant'
+      fullPath: '/dashboard/participant'
+      preLoaderRoute: typeof DashboardParticipantRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/organizer': {
+      id: '/dashboard/organizer'
+      path: '/dashboard/organizer'
+      fullPath: '/dashboard/organizer'
+      preLoaderRoute: typeof DashboardOrganizerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -89,7 +179,21 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
+  DashboardOrganizerRoute: DashboardOrganizerRoute,
+  DashboardParticipantRoute: DashboardParticipantRoute,
+  DashboardSponsorRoute: DashboardSponsorRoute,
+  DashboardVolunteerRoute: DashboardVolunteerRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
