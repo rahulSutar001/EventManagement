@@ -22,7 +22,7 @@ function Landing() {
         </Link>
         <div className="flex items-center gap-3">
           <Link to="/login" className="text-sm font-medium px-4 py-2 hover:text-primary">Log in</Link>
-          <Link to="/signup" className="text-sm font-medium px-4 py-2 rounded-md gradient-cta">Join EventTech</Link>
+          <Link to="/signup" search={{ role: undefined }} className="text-sm font-medium px-4 py-2 rounded-md gradient-cta">Join EventTech</Link>
         </div>
       </nav>
 
@@ -38,7 +38,7 @@ function Landing() {
           Smart matching, live Kanban, transparent budgets and digital tickets.
         </p>
         <div className="mt-8 flex justify-center gap-3">
-          <Link to="/signup" className="rounded-lg gradient-cta px-6 py-3 font-medium">Get started free</Link>
+          <Link to="/signup" search={{ role: undefined }} className="rounded-lg gradient-cta px-6 py-3 font-medium">Get started free</Link>
           <Link to="/login" className="rounded-lg glass px-6 py-3 font-medium">I have an account</Link>
         </div>
       </header>

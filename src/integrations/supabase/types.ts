@@ -290,8 +290,10 @@ export type Database = {
           created_at: string | null
           email: string | null
           full_name: string | null
+          github_url: string | null
           hashtags: string | null
           id: string
+          linkedin_url: string | null
           role: Database["public"]["Enums"]["app_role"]
           xp: number
         }
@@ -301,8 +303,10 @@ export type Database = {
           created_at?: string | null
           email?: string | null
           full_name?: string | null
+          github_url?: string | null
           hashtags?: string | null
           id: string
+          linkedin_url?: string | null
           role: Database["public"]["Enums"]["app_role"]
           xp?: number
         }
@@ -312,8 +316,10 @@ export type Database = {
           created_at?: string | null
           email?: string | null
           full_name?: string | null
+          github_url?: string | null
           hashtags?: string | null
           id?: string
+          linkedin_url?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           xp?: number
         }
@@ -406,6 +412,11 @@ export type Database = {
           sponsor_id: string
           status: Database["public"]["Enums"]["app_status"] | null
           tier: string | null
+          amount_allocated: number | null
+          total_spent: number | null
+          target_audience_reach: number | null
+          expected_calls_leads: number | null
+          brand_awareness_impressions: number | null
         }
         Insert: {
           created_at?: string | null
@@ -416,6 +427,11 @@ export type Database = {
           sponsor_id: string
           status?: Database["public"]["Enums"]["app_status"] | null
           tier?: string | null
+          amount_allocated?: number | null
+          total_spent?: number | null
+          target_audience_reach?: number | null
+          expected_calls_leads?: number | null
+          brand_awareness_impressions?: number | null
         }
         Update: {
           created_at?: string | null
@@ -426,6 +442,11 @@ export type Database = {
           sponsor_id?: string
           status?: Database["public"]["Enums"]["app_status"] | null
           tier?: string | null
+          amount_allocated?: number | null
+          total_spent?: number | null
+          target_audience_reach?: number | null
+          expected_calls_leads?: number | null
+          brand_awareness_impressions?: number | null
         }
         Relationships: [
           {

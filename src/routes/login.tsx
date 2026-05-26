@@ -55,7 +55,7 @@ function LoginPage() {
           </button>
         </form>
         <p className="mt-6 text-center text-sm">
-          New here? <Link to="/signup" className="text-primary font-medium">Create an account</Link>
+          New here? <Link to="/signup" search={{ role: undefined }} className="text-primary font-medium">Create an account</Link>
         </p>
       </div>
     </div>

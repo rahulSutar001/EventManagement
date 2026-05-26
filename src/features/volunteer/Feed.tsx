@@ -12,6 +12,8 @@ export function VolunteerFeed() {
   const [applied, setApplied] = useState<Set<string>>(new Set());
   const [skills, setSkills] = useState<string[]>([]);
   const [openFor, setOpenFor] = useState<any>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
 
   useEffect(() => {
     if (!user) return;
@@ -23,17 +25,37 @@ export function VolunteerFeed() {
       .then(({data})=>setSkills((data?.skills as string[])||[]));
   }, [user]);
 
+  const totalPages = Math.ceil(events.length / itemsPerPage);
+  const currentEvents = events.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
   return (
     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {events.map(e => {
+      {currentEvents.map(e => {
         const themes: string[] = Array.isArray(e.themes) ? e.themes : [];
         const matchTag = themes.find(t => skills.some(s => s.toLowerCase().includes(t.toLowerCase()))) || skills[0] || "your profile";
         return (
-          <div key={e.id} className="glass rounded-2xl p-5 flex flex-col">
-            <div className="h-32 rounded-xl bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 mb-3 grid place-items-center text-white text-2xl font-bold opacity-90">{e.title.slice(0,2).toUpperCase()}</div>
-            <h3 className="font-semibold">{e.title}</h3>
-            <p className="text-xs text-muted-foreground mt-1">{e.event_date || "Date TBA"} • {e.expected_footfall || "—"} attendees</p>
-            <div className="mt-2 inline-flex items-center gap-1 text-xs text-primary font-medium"><Sparkles className="h-3 w-3"/> Matches #{matchTag}</div>
+          <div key={e.id} className="glass rounded-2xl p-5 flex flex-col justify-between">
+            <div>
+              <div className="h-32 rounded-xl bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 mb-3 grid place-items-center text-white text-2xl font-bold opacity-90">{e.title.slice(0,2).toUpperCase()}</div>
+              <h3 className="font-semibold">{e.title}</h3>
+              <p className="text-xs text-muted-foreground mt-1">{e.event_date || "Date TBA"} • {e.expected_footfall || "—"} attendees</p>
+              <div className="mt-2 inline-flex items-center gap-1 text-xs text-primary font-medium"><Sparkles className="h-3 w-3"/> Matches #{matchTag}</div>
+              <div className="mt-3 border-t border-border/40 pt-3">
+                <p className="text-[10px] font-semibold text-primary mb-1">Timeline:</p>
+                {e.timeline && Array.isArray(e.timeline) && e.timeline.length > 0 ? (
+                  <ul className="text-[11px] text-muted-foreground space-y-1">
+                    {e.timeline.slice(0, 3).map((item: any, idx: number) => (
+                      <li key={idx} className="truncate">
+                        ⏰ {item.start_time} - {item.end_time}: {item.title} ({item.location || "TBA"})
+                      </li>
+                    ))}
+                    {e.timeline.length > 3 && <li className="text-[10px] italic text-primary">+{e.timeline.length - 3} more sessions</li>}
+                  </ul>
+                ) : (
+                  <p className="text-[11px] italic text-muted-foreground">No timeline added</p>
+                )}
+              </div>
+            </div>
             <button disabled={applied.has(e.id)} onClick={()=>setOpenFor(e)} className="mt-4 w-full rounded-lg gradient-cta py-2 text-sm disabled:opacity-50">
               {applied.has(e.id) ? "Applied ✓" : "Apply to Help"}
             </button>
@@ -42,6 +64,26 @@ export function VolunteerFeed() {
       })}
       {openFor && <ApplyModal event={openFor} onClose={()=>setOpenFor(null)} onDone={()=>{setApplied(new Set([...applied, openFor.id])); setOpenFor(null);}}/>}
       {!events.length && <div className="col-span-full glass rounded-2xl p-8 text-center text-muted-foreground">No published events yet.</div>}
+
+      {totalPages > 1 && (
+        <div className="col-span-full flex justify-center items-center gap-4 mt-6">
+          <button 
+            disabled={currentPage === 1} 
+            onClick={() => setCurrentPage(p => p - 1)}
+            className="px-3 py-1.5 rounded-lg border border-input bg-white/70 text-sm disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <span className="text-sm font-medium">Page {currentPage} of {totalPages}</span>
+          <button 
+            disabled={currentPage === totalPages} 
+            onClick={() => setCurrentPage(p => p + 1)}
+            className="px-3 py-1.5 rounded-lg border border-input bg-white/70 text-sm disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }

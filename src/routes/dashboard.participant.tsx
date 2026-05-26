@@ -4,6 +4,7 @@ import { PrettyTabs } from "@/components/PrettyTabs";
 import { ParticipantDiscover } from "@/features/participant/Discover";
 import { ParticipantMyEvents } from "@/features/participant/MyEvents";
 import { ParticipantActive } from "@/features/participant/Active";
+import { UserProfile } from "@/components/UserProfile";
 
 export const Route = createFileRoute("/dashboard/participant")({ component: ParticipantDashboard });
 
@@ -14,6 +15,7 @@ function ParticipantDashboard() {
         { value: "discover", label: "Discover", content: <ParticipantDiscover/> },
         { value: "my", label: "My Events", content: <ParticipantMyEvents/> },
         { value: "active", label: "Active Event", content: <ParticipantActive/> },
+        { value: "profile", label: "Profile", content: <UserProfile/> },
       ]}/>
     </DashboardShell>
   );

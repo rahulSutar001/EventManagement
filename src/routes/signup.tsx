@@ -9,7 +9,7 @@ import { Calendar, Users, Briefcase, Trophy } from "lucide-react";
 
 export const Route = createFileRoute("/signup")({
   component: SignupPage,
-  validateSearch: (s: Record<string, unknown>) => ({ role: (s.role as Role) || undefined }),
+  validateSearch: (s: Record<string, unknown>): { role?: Role } => ({ role: (s.role as Role) || undefined }),
 });
 
 const baseSchema = z.object({
@@ -103,8 +103,14 @@ function RoleForm({ role }: { role: Role }) {
     if (error || !data.user) { toast.error(error?.message || "Signup failed"); setBusy(false); return; }
     const uid = data.user.id;
     const { error: pErr } = await supabase.from("profiles").insert({
-      id: uid, full_name: parsed.data.full_name, email: parsed.data.email,
-      role, bio: parsed.data.bio, hashtags: parsed.data.hashtags,
+      id: uid,
+      full_name: parsed.data.full_name,
+      email: parsed.data.email,
+      role,
+      bio: parsed.data.bio,
+      hashtags: parsed.data.hashtags,
+      github_url: role === "participant" ? extra.github_url : null,
+      linkedin_url: role === "participant" ? extra.linkedin_url : null,
     });
     if (pErr) { toast.error(pErr.message); setBusy(false); return; }
 
@@ -123,7 +129,7 @@ function RoleForm({ role }: { role: Role }) {
   return (
     <div className="min-h-screen px-4 py-12">
       <div className="mx-auto max-w-2xl">
-        <Link to="/signup" className="text-sm text-muted-foreground">← Change role</Link>
+        <Link to="/signup" search={{ role: undefined }} className="text-sm text-muted-foreground">← Change role</Link>
         <h1 className="mt-2 text-3xl font-bold capitalize">Join as {role}</h1>
         <form onSubmit={submit} className="mt-6 space-y-4 glass-strong rounded-2xl p-6">
           <div className="grid md:grid-cols-2 gap-4">
