@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { User, Mail, Shield, Calendar, Globe, Edit3, Save, Linkedin, Github } from "lucide-react";
 import { toast } from "sonner";
+import { formatExternalLink } from "@/lib/utils";
 
 export function UserProfile() {
   const { user, role } = useAuth();
@@ -190,7 +191,7 @@ export function UserProfile() {
                     ) : (
                       linkedin ? (
                         <a
-                          href={linkedin}
+                          href={formatExternalLink(linkedin)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-2 text-xs text-purple-600 hover:text-purple-800 font-semibold hover:underline transition"
@@ -226,7 +227,7 @@ export function UserProfile() {
                     ) : (
                       github ? (
                         <a
-                          href={github}
+                          href={formatExternalLink(github)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-2 text-xs text-purple-600 hover:text-purple-800 font-semibold hover:underline transition"

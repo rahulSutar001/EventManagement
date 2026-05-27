@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Ticket, MapPin, Users, Sparkles, ExternalLink } from "lucide-react";
+import { formatExternalLink } from "@/lib/utils";
 
 export function ParticipantActive() {
   const { user } = useAuth();
@@ -160,26 +161,32 @@ function Timeline({ timeline }: { timeline?: any[] }) {
 }
 
 function Networking({ eventId }: { eventId: string }) {
+  const { user } = useAuth();
   const [people, setPeople] = useState<any[]>([]);
+  const [checkedInCount, setCheckedInCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadNetworking = async () => {
       setLoading(true);
-      // Step 1: Get checked-in participant IDs for this event
-      const { data: checkins } = await supabase
+      // Step 1: Get all registered participant IDs for this event
+      const { data: registrations } = await supabase
         .from("registrations")
-        .select("participant_id")
-        .eq("event_id", eventId)
-        .eq("checked_in", true);
+        .select("participant_id, checked_in")
+        .eq("event_id", eventId);
 
-      if (!checkins || checkins.length === 0) {
+      if (!registrations || registrations.length === 0) {
         setPeople([]);
+        setCheckedInCount(0);
         setLoading(false);
         return;
       }
 
-      const ids = checkins.map((c) => c.participant_id);
+      // Count checked in participants
+      const checkedIn = registrations.filter((r) => r.checked_in).length;
+      setCheckedInCount(checkedIn);
+
+      const ids = registrations.map((c) => c.participant_id);
 
       // Step 2: Get profile info for those participants
       const { data: profiles } = await supabase
@@ -204,19 +211,22 @@ function Networking({ eventId }: { eventId: string }) {
         };
       });
 
-      setPeople(merged);
+      // Filter out the currently logged-in user from appearing in their own list
+      const others = merged.filter((p) => p.id !== user?.id);
+
+      setPeople(others);
       setLoading(false);
     };
 
     loadNetworking();
 
-    // Realtime: refresh when someone checks in
+    // Realtime: refresh when registrations change (insert, update, delete)
     const ch = supabase
       .channel(`networking-${eventId}`)
       .on(
         "postgres_changes",
         {
-          event: "UPDATE",
+          event: "*",
           schema: "public",
           table: "registrations",
           filter: `event_id=eq.${eventId}`,
@@ -228,7 +238,7 @@ function Networking({ eventId }: { eventId: string }) {
     return () => {
       supabase.removeChannel(ch);
     };
-  }, [eventId]);
+  }, [eventId, user]);
 
   return (
     <div className="glass-strong rounded-2xl p-5">
@@ -236,7 +246,7 @@ function Networking({ eventId }: { eventId: string }) {
         <Sparkles className="h-4 w-4 text-primary" /> AI Networking Hub
       </h3>
       <p className="text-xs text-muted-foreground flex items-center gap-1 mb-4">
-        <Users className="inline h-3 w-3" /> {people.length} participants checked in
+        <Users className="inline h-3 w-3" /> {checkedInCount} participants checked in
         {loading && " · Loading..."}
       </p>
       <div className="grid sm:grid-cols-2 gap-3">
@@ -268,9 +278,9 @@ function Networking({ eventId }: { eventId: string }) {
             )}
             {/* Links */}
             <div className="mt-2 flex gap-3">
-              {p.github_url && (
+              {p.github_url && p.github_url.trim() !== "" && (
                 <a
-                  href={p.github_url}
+                  href={formatExternalLink(p.github_url)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1"
@@ -278,9 +288,9 @@ function Networking({ eventId }: { eventId: string }) {
                   <ExternalLink className="h-3 w-3" /> GitHub
                 </a>
               )}
-              {p.linkedin_url && (
+              {p.linkedin_url && p.linkedin_url.trim() !== "" && (
                 <a
-                  href={p.linkedin_url}
+                  href={formatExternalLink(p.linkedin_url)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1"
@@ -293,7 +303,7 @@ function Networking({ eventId }: { eventId: string }) {
         ))}
         {!loading && !people.length && (
           <p className="col-span-full text-sm text-muted-foreground text-center py-4">
-            No participants have checked in yet. Be the first! 🎉
+            No other participants have registered yet. 🎉
           </p>
         )}
       </div>
