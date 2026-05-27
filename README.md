@@ -100,3 +100,17 @@ Start the local development server:
 npm run dev
 ```
 Open your browser and navigate to the port output in your terminal (typically `http://localhost:8080` or `http://localhost:5173`).
+
+---
+
+## 🌐 Deployment to Render
+
+This application is configured to run on a Node.js production server. To deploy to **Render**:
+
+1. Create a new **Web Service** on Render and connect your GitHub repository.
+2. In the configuration settings, choose **Node** for the runtime environment.
+3. Configure the following build and start commands:
+   * **Build Command**: `npm install && npm run build`
+   * **Start Command**: `node server.mjs` (or `npm start`)
+4. Under **Environment Variables**, configure your environment variables from `.env` (such as `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`).
+5. Click **Create Web Service** to start the build and deployment process.
